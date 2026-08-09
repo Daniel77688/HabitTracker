@@ -17,8 +17,8 @@ def init_db():
     
     import src.models.habit_model  # noqa: F401
     import src.models.habit_log_model
-    import src.models.steak_model
-    import src.models.users_model
+    import src.models.streak_model
+    import src.models.user_model
     
     Base.metadata.create_all(bind=engine)
     
