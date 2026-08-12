@@ -6,13 +6,7 @@ logger = logging.getLogger(__name__)
 
 def create_habit(db: Session, user_id: int, title: str, description: str = None, frequency_type: Freq = Freq.daily, target_days: list = None):
     try:
-        habit = Habit(
-            user_id=user_id,
-            title=title,
-            description=description,
-            frequency_type=frequency_type,
-            target_days=target_days
-        )
+        habit = Habit(user_id=user_id, title=title, description=description, frequency_type=frequency_type, target_days=target_days)
         db.add(habit)    
         db.commit()
         db.refresh(habit)

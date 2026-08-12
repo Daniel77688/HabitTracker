@@ -9,6 +9,8 @@ router = APIRouter(prefix="/habits", tags=["Habits"])
 
 @router.post("/", response_model=HabitResponse, status_code=status.HTTP_201_CREATED)
 def create_new_habit(habit_data: HabitCreate, db: Session = Depends(get_db)):
+    if not habit_data.user_id:
+        raise HTTPException(status_code=400, detail="Se requiere user_id para crear un hábito.")
     try:
         new_habit = habit_service.create_habit(db=db, user_id=habit_data.user_id, title=habit_data.title, description=habit_data.description, frequency_type=habit_data.frequency_type, target_days=habit_data.target_days)
         return new_habit
@@ -29,14 +31,18 @@ def get_habit(habit_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{habit_id}", response_model=HabitResponse)
 def update_existing_habit(habit_id: int, habit_data: HabitUpdate, db: Session = Depends(get_db)):
-    updated = habit_service.update_habit(db=db, habit_id=habit_id, title=habit_data.title, description=habit_data.description, frequency_type=habit_data.frequency_type, target_days=habit_data.target_days, status=habit_data.status)
-    if not updated:
+    existing = habit_service.read_habit(db=db, habit_id=habit_id)
+    if not existing:
         raise HTTPException(status_code=404, detail="Habit not found")
+
+    updated = habit_service.update_habit(db=db, habit_id=habit_id, title=habit_data.title, description=habit_data.description, frequency_type=habit_data.frequency_type, target_days=habit_data.target_days, status=habit_data.status)
     return updated
 
 @router.delete("/{habit_id}")
 def delete_existing_habit(habit_id: int, db: Session = Depends(get_db)):
-    success = habit_service.delete_habit(db=db, habit_id=habit_id)
-    if not success:
+    existing = habit_service.read_habit(db=db, habit_id=habit_id)
+    if not existing:
         raise HTTPException(status_code=404, detail="Habit not found")
+
+    habit_service.delete_habit(db=db, habit_id=habit_id)
     return {"message": "Habit deleted successfully"}

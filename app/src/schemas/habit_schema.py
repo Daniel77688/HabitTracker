@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from src.models.habit_model import Freq, Status
 
 class HabitCreate(BaseModel):
-    user_id: int
+    user_id: Optional[int] = None
     title: str
     description: Optional[str] = None
-    frequency_type: Freq
+    frequency_type: Freq = Freq.daily
     target_days: Optional[List[int]] = None
 
 class HabitUpdate(BaseModel):
@@ -25,5 +25,4 @@ class HabitResponse(BaseModel):
     target_days: Optional[List[int]] = None
     status: Status
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

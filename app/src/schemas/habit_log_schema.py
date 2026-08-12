@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import date
 
@@ -12,5 +12,4 @@ class HabitLogResponse(BaseModel):
     completed_date: date
     notes: Optional[str] = None
 
-    class Config:
-        from_attributes = True  # Permite mapear modelos de SQLAlchemy directamente a Pydantic
+    model_config = ConfigDict(from_attributes=True)

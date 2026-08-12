@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.models.database import init_db
-from src.controllers import habit_controller, habit_log_controller, users_controller, streak_controller
+from src.controllers import habit_controller, habit_log_controller, users_controller, streak_controller, auth_controller
 
 init_db()
 
@@ -15,10 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_controller.router)
 app.include_router(habit_controller.router)
 app.include_router(habit_log_controller.router)
 app.include_router(users_controller.router)
 app.include_router(streak_controller.router)
+
 
 @app.get("/")
 def root():

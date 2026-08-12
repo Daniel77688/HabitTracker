@@ -3,16 +3,16 @@ import enum
 from sqlalchemy import Column, Integer, String, Enum, JSON, TIMESTAMP, func, ForeignKey
 from src.models.database import Base
 
-class Freq(enum.Enum):
-    daily = 1
-    weekly = 2
-    monthly = 3
-    custom = 4
+class Freq(str, enum.Enum):
+    daily = "daily"
+    weekly = "weekly"
+    monthly = "monthly"
+    custom = "custom"
     
-class Status(enum.Enum):
-    active = 1
-    archived = 2
-    deleted = 3
+class Status(str, enum.Enum):
+    active = "active"
+    archived = "archived"
+    deleted = "deleted"
     
 class Habit(Base):
     __tablename__ = "habits"
