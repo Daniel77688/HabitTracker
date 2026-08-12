@@ -10,10 +10,12 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { HabitCardComponent } from '../habit-card/habit-card.component';
 import { forkJoin } from 'rxjs';
 
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, AuthModalComponent, HabitCardComponent],
+  imports: [CommonModule, FormsModule, RouterLink, AuthModalComponent, HabitCardComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })

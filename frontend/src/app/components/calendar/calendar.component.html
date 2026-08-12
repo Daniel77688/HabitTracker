@@ -1,0 +1,237 @@
+<!-- Navbar (reutilizado del dashboard) -->
+<header class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <span class="brand-title">Habit<span class="brand-sub">Tracker</span></span>
+    </div>
+
+    <div class="nav-center">
+      <a class="nav-link" routerLink="/">Panel</a>
+      <a class="nav-link active" routerLink="/calendar">Calendario</a>
+    </div>
+
+    <div class="nav-right">
+      <button class="btn btn-ghost btn-sm theme-toggle-btn" (click)="toggleTheme()">
+        <svg *ngIf="currentTheme === 'dark'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg *ngIf="currentTheme === 'light'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <span>{{ currentTheme === 'dark' ? 'Modo claro' : 'Modo oscuro' }}</span>
+      </button>
+      <div class="user-pill" *ngIf="user">
+        <div class="avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
+        <span class="username">{{ user.username }}</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- No auth state -->
+<div class="auth-gate fade-in" *ngIf="!user">
+  <div class="auth-gate-inner">
+    <div class="gate-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+    <h2>Inicia sesión para ver el calendario</h2>
+    <p>Necesitas una cuenta para acceder al historial de tus hábitos.</p>
+    <a class="btn btn-primary" routerLink="/">Ir al inicio</a>
+  </div>
+</div>
+
+<!-- Main Calendar -->
+<main class="cal-page" *ngIf="user">
+  <div class="cal-container">
+
+    <!-- Page title -->
+    <div class="cal-header fade-in">
+      <div>
+        <h1>Calendario de Hábitos</h1>
+        <p>Visualiza tu progreso a lo largo del tiempo</p>
+      </div>
+    </div>
+
+    <!-- Controls bar -->
+    <div class="controls-bar fade-in">
+      <!-- View selector -->
+      <div class="view-tabs">
+        <button class="view-tab" [class.active]="view === 'week'"   (click)="view='week';   onViewChange()">Semana</button>
+        <button class="view-tab" [class.active]="view === 'month'"  (click)="view='month';  onViewChange()">Mes</button>
+        <button class="view-tab" [class.active]="view === 'year'"   (click)="view='year';   onViewChange()">Año</button>
+        <button class="view-tab" [class.active]="view === 'custom'" (click)="view='custom'; onViewChange()">Personalizado</button>
+      </div>
+
+      <!-- Habit selector -->
+      <select class="select-filter" [(ngModel)]="selectedHabitId" (ngModelChange)="onHabitChange()">
+        <option value="all">Todos los hábitos</option>
+        <option *ngFor="let h of habits" [value]="h.id">{{ h.title }}</option>
+      </select>
+    </div>
+
+    <!-- Custom date range inputs -->
+    <div class="custom-range fade-in" *ngIf="view === 'custom'">
+      <div class="range-inputs">
+        <div class="range-field">
+          <label>Desde</label>
+          <input type="date" class="input-field" [(ngModel)]="customFrom">
+        </div>
+        <div class="range-field">
+          <label>Hasta</label>
+          <input type="date" class="input-field" [(ngModel)]="customTo">
+        </div>
+        <button class="btn btn-primary" (click)="onCustomRangeApply()">Aplicar</button>
+      </div>
+    </div>
+
+    <!-- Navigation + period label -->
+    <div class="period-nav fade-in" *ngIf="view !== 'custom'">
+      <button class="nav-arrow" (click)="prev()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div class="period-label">{{ periodLabel }}</div>
+      <button class="nav-arrow" (click)="next()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="btn btn-ghost btn-sm today-btn" (click)="goToday()">Hoy</button>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row fade-in">
+      <div class="stat-chip">
+        <span class="stat-num">{{ totalCompletions }}</span>
+        <span class="stat-lbl">Completados</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-num">{{ activeDays }}</span>
+        <span class="stat-lbl">Días activos</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-num">{{ habitName }}</span>
+        <span class="stat-lbl">Filtro</span>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="state-container" *ngIf="isLoading">
+      <div class="spinner-lg"></div>
+      <p>Cargando historial...</p>
+    </div>
+
+    <!-- ─── WEEK VIEW ──────────────────────────────────────────────────────── -->
+    <div class="week-view fade-in" *ngIf="!isLoading && view === 'week'">
+      <div class="week-grid">
+        <div class="week-col" *ngFor="let day of weekDays; trackBy: trackByDate">
+          <div class="week-day-name">{{ dayLabels[day.dateObj.getDay() === 0 ? 6 : day.dateObj.getDay() - 1] }}</div>
+          <div class="week-date-num" [class.today]="day.isToday">{{ day.dateObj.getDate() }}</div>
+
+          <div class="week-habits">
+            <ng-container *ngIf="day.count > 0; else noneWeek">
+              <div class="habit-dot completed" *ngFor="let i of [].constructor(day.count)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              </div>
+            </ng-container>
+            <ng-template #noneWeek>
+              <div class="habit-dot empty"></div>
+            </ng-template>
+          </div>
+
+          <div class="week-count" [class.has-count]="day.count > 0">
+            {{ day.count > 0 ? day.count + (day.count === 1 ? ' hábito' : ' hábitos') : '—' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MONTH VIEW ─────────────────────────────────────────────────────── -->
+    <div class="month-view fade-in" *ngIf="!isLoading && (view === 'month' || view === 'custom')">
+      <!-- Day headers -->
+      <div class="month-header-row">
+        <div class="month-day-header" *ngFor="let d of dayLabels">{{ d }}</div>
+      </div>
+      <!-- Weeks -->
+      <div class="month-row" *ngFor="let row of weekRows; trackBy: trackByIndex">
+        <div class="month-cell"
+             *ngFor="let day of row; trackBy: trackByDate"
+             [class.today]="day.isToday"
+             [class.out-of-month]="!day.isCurrentMonth"
+             [class.has-activity]="day.count > 0"
+             [attr.data-intensity]="intensity(day.count)">
+          <div class="cell-date">{{ day.dateObj.getDate() }}</div>
+          <div class="cell-dots" *ngIf="day.count > 0">
+            <span class="cell-count">{{ day.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── YEAR VIEW (Heatmap) ────────────────────────────────────────────── -->
+    <div class="year-view fade-in" *ngIf="!isLoading && view === 'year'">
+      <div class="heatmap-wrapper">
+        <!-- Month labels -->
+        <div class="heatmap-month-labels">
+          <div class="day-row-label-spacer"></div>
+          <div class="month-labels-row">
+            <span *ngFor="let lbl of yearMonthLabels"
+                  class="month-lbl"
+                  [style.grid-column]="lbl.col + 1">{{ lbl.label }}</span>
+          </div>
+        </div>
+        <!-- Heatmap grid -->
+        <div class="heatmap-grid-wrapper">
+          <div class="day-row-labels">
+            <span class="day-row-lbl">Lun</span>
+            <span class="day-row-lbl"></span>
+            <span class="day-row-lbl">Mié</span>
+            <span class="day-row-lbl"></span>
+            <span class="day-row-lbl">Vie</span>
+            <span class="day-row-lbl"></span>
+            <span class="day-row-lbl">Dom</span>
+          </div>
+          <div class="heatmap-grid">
+            <div class="heatmap-col" *ngFor="let col of yearData[0]; let ci = index; trackBy: trackByIndex">
+              <div class="heatmap-cell"
+                   *ngFor="let row of yearData; trackBy: trackByIndex"
+                   [class.out-of-year]="!row[ci].isInRange"
+                   [attr.data-intensity]="intensity(row[ci].count)"
+                   [title]="row[ci].date + ': ' + row[ci].count + ' completados'">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="heatmap-legend">
+          <span>Menos</span>
+          <div class="legend-cell" data-intensity="0"></div>
+          <div class="legend-cell" data-intensity="1"></div>
+          <div class="legend-cell" data-intensity="2"></div>
+          <div class="legend-cell" data-intensity="3"></div>
+          <div class="legend-cell" data-intensity="4"></div>
+          <span>Más</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>

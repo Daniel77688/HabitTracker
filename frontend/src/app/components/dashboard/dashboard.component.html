@@ -11,6 +11,11 @@
       <span class="brand-title">Habit<span class="brand-sub">Tracker</span></span>
     </div>
 
+    <div class="nav-center">
+      <a class="nav-link active" routerLink="/">Panel</a>
+      <a class="nav-link" routerLink="/calendar">Calendario</a>
+    </div>
+
     <div class="nav-right">
       <button class="btn btn-ghost btn-sm theme-toggle-btn" (click)="toggleTheme()" [title]="currentTheme === 'dark' ? 'Cambiar a modo claro (Crema)' : 'Cambiar a modo oscuro (Gris)'">
         <svg *ngIf="currentTheme === 'dark'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
