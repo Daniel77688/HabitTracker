@@ -1,0 +1,88 @@
+<div class="habit-card fade-in" [style.animation-delay.ms]="animationDelay" [class.is-completed]="isTodayCompleted">
+  <div class="card-top">
+    <div class="header-main">
+      <div class="badge-row">
+        <span class="badge" [ngClass]="frequencyBadgeClass">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          {{ frequencyLabel }}
+        </span>
+        <span class="completed-indicator" *ngIf="isTodayCompleted">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Completado hoy
+        </span>
+      </div>
+
+      <h3 class="habit-title">{{ habit.title }}</h3>
+      <p class="habit-desc" *ngIf="habit.description">{{ habit.description }}</p>
+    </div>
+
+    <div class="card-menu">
+      <button class="menu-btn" *ngIf="habit.status === 'active'" (click)="onArchive()" title="Archivar hábito">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="21 8 21 21 3 21 3 8"/>
+          <rect x="1" y="3" width="22" height="5"/>
+          <line x1="10" y1="12" x2="14" y2="12"/>
+        </svg>
+      </button>
+
+      <button class="menu-btn" *ngIf="habit.status === 'archived'" (click)="onUnarchive()" title="Restaurar hábito">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 14 15 14 15 8"/>
+          <polyline points="12 11 15 8 18 11"/>
+          <path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/>
+        </svg>
+      </button>
+
+      <button class="menu-btn menu-btn-danger" (click)="onDelete()" title="Eliminar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Week days indicator bar for daily / custom habits -->
+  <div class="week-tracker" *ngIf="habit.frequency_type === 'daily' || habit.frequency_type === 'custom'">
+    <div *ngFor="let day of weekDays" 
+         class="day-dot" 
+         [class.is-target]="isDayTarget(day.index)"
+         [title]="day.name">
+      {{ day.label }}
+    </div>
+  </div>
+
+  <div class="card-bottom">
+    <div class="streak-metrics">
+      <div class="metric-item" [class.has-streak]="currentStreak > 0">
+        <svg class="streak-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+        </svg>
+        <span class="metric-val font-mono">{{ currentStreak }}</span>
+        <span class="metric-lbl">racha actual</span>
+      </div>
+
+      <div class="metric-best">
+        Racha máx. <span class="font-mono">{{ longestStreak }}</span>
+      </div>
+    </div>
+
+    <button *ngIf="habit.status === 'active'" 
+            class="action-complete" 
+            [class.completed]="isTodayCompleted"
+            [class.loading]="isCompleting"
+            (click)="onComplete()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span>{{ isTodayCompleted ? 'Registrado' : 'Completar' }}</span>
+    </button>
+  </div>
+</div>
