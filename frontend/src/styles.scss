@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+/* Default Theme: Dark (Grisáceo elegante, no negro puro) */
+:root, [data-theme="dark"] {
+  --bg-app: #1a1b20;
+  --bg-surface-0: #22232a;
+  --bg-surface-1: #282932;
+  --bg-surface-2: #323440;
+  --bg-surface-hover: #3a3c4a;
+  --bg-input: #1f2027;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-active: #818cf8;
+
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-tertiary: #6b7280;
+  --text-muted: #4b5563;
+
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-primary-light: rgba(99, 102, 241, 0.15);
+
+  --accent-emerald: #10b981;
+  --accent-emerald-hover: #059669;
+  --accent-emerald-light: rgba(16, 185, 129, 0.15);
+
+  --accent-amber: #f59e0b;
+  --accent-amber-light: rgba(245, 158, 11, 0.15);
+
+  --accent-rose: #f43f5e;
+  --accent-rose-light: rgba(244, 63, 94, 0.15);
+
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 20px -3px rgba(99, 102, 241, 0.25);
+}
+
+/* Light Theme: Crema cálido con alto contraste y acentos en VERDE */
+[data-theme="light"] {
+  --bg-app: #f4f0e6;
+  --bg-surface-0: #ffffff;
+  --bg-surface-1: #ffffff;
+  --bg-surface-2: #e5e0d3;
+  --bg-surface-hover: #fcfbfa;
+  --bg-input: #ffffff;
+  
+  --border-subtle: #d6cfbe;
+  --border-medium: #b8af9b;
+  --border-active: #059669;
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+
+  --accent-primary: #059669;
+  --accent-primary-hover: #047857;
+  --accent-primary-light: rgba(5, 150, 105, 0.14);
+
+  --accent-emerald: #059669;
+  --accent-emerald-hover: #047857;
+  --accent-emerald-light: rgba(5, 150, 105, 0.14);
+
+  --accent-amber: #d97706;
+  --accent-amber-light: rgba(217, 119, 6, 0.14);
+
+  --accent-rose: #dc2626;
+  --accent-rose-light: rgba(220, 38, 38, 0.14);
+
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 20px -3px rgba(5, 150, 105, 0.25);
+}
+
+
+/* Resto del CSS sin bordes redondeados en nada */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 !important;
+}
+
+html {
+  font-size: 15px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface-2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+
+  &-primary {
+    background: var(--accent-primary);
+    color: #ffffff;
+
+    &:hover {
+      background: var(--accent-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &-emerald {
+    background: var(--accent-emerald);
+    color: #ffffff;
+
+    &:hover {
+      background: var(--accent-emerald-hover);
+      transform: translateY(-1px);
+    }
+  }
+
+  &-secondary {
+    background: var(--bg-surface-1);
+    border: 1px solid var(--border-medium);
+    color: var(--text-primary);
+
+    &:hover {
+      background: var(--bg-surface-hover);
+    }
+  }
+
+  &-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+
+    &:hover {
+      background: var(--bg-surface-1);
+      color: var(--text-primary);
+    }
+  }
+
+  &-danger {
+    background: var(--accent-rose-light);
+    color: var(--accent-rose);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+
+    &:hover {
+      background: rgba(244, 63, 94, 0.25);
+    }
+  }
+
+  &-sm {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &-lg {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  &:hover {
+    border-color: var(--text-tertiary);
+  }
+
+  &:focus {
+    border-color: var(--border-active);
+    box-shadow: 0 0 0 2px var(--accent-primary-light);
+    outline: none;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &-daily {
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+    border: 1px solid var(--border-medium);
+  }
+  &-weekly {
+    background: rgba(6, 182, 212, 0.12);
+    color: #0284c7;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+  &-monthly {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  &-custom {
+    background: rgba(236, 72, 153, 0.12);
+    color: #db2777;
+    border: 1px solid rgba(236, 72, 153, 0.2);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
