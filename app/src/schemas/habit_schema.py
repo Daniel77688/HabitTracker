@@ -15,3 +15,15 @@ class HabitUpdate(BaseModel):
     frequency_type: Optional[Freq] = None
     target_days: Optional[List[int]] = None
     status: Optional[Status] = None
+
+class HabitResponse(BaseModel):
+    id: int
+    user_id: int
+    title: str
+    description: Optional[str] = None
+    frequency_type: Freq
+    target_days: Optional[List[int]] = None
+    status: Status
+
+    class Config:
+        from_attributes = True

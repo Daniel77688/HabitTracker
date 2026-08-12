@@ -1,23 +1,24 @@
+import logging
 from datetime import date
-from src.models.database import SessionLocal
+from sqlalchemy.orm import Session
 from src.models.habit_log_model import HabitLog
 from src.models.habit_model import Habit
 
-def log_habit_completion(habit_id: int, notes: str = None):
-    db = SessionLocal()
-    
+logger = logging.getLogger(__name__)
+
+def log_habit_completion(db: Session, habit_id: int, notes: str = None):
     try:
         habit = db.query(Habit).filter(Habit.id == habit_id).first()
         
         if not habit:
-            print(f"Cant register habit with ID: {habit_id}")
+            logger.warning(f"No se puede registrar log para el hábito con ID: {habit_id}")
             return None
 
         hoy = date.today()
         existing_log = db.query(HabitLog).filter(HabitLog.habit_id == habit_id, HabitLog.completed_date == hoy).first()
 
         if existing_log:
-            print(f"The habit: '{habit.title}', has already been completed.")
+            logger.info(f"El hábito '{habit.title}' ya ha sido completado hoy.")
             return existing_log
 
         nuevo_log = HabitLog(habit_id=habit_id, completed_date=hoy, notes=notes)
@@ -26,45 +27,37 @@ def log_habit_completion(habit_id: int, notes: str = None):
         db.commit()
         db.refresh(nuevo_log)
         
-        print(f"Habit: '{habit.title}', successfully completed today ({hoy})")
+        logger.info(f"Hábito '{habit.title}' completado hoy ({hoy})")
         return nuevo_log
 
     except Exception as e:
         db.rollback()
-        print(f"Error registering the completition of the habit: {e}")
+        logger.error(f"Error registrando el cumplimiento del hábito: {e}")
         raise e
-    finally:
-        db.close()
 
 
-def get_habit_logs(habit_id: int):
-    db = SessionLocal()
+def get_habit_logs(db: Session, habit_id: int):
     try:
         logs = db.query(HabitLog).filter(HabitLog.habit_id == habit_id).all()
         return logs
     except Exception as e:
-        print(f"Error obtaining the logs of the habit: {e}")
+        logger.error(f"Error obteniendo los logs del hábito: {e}")
         return []
-    finally:
-        db.close()
 
 
-def delete_log(log_id: int):
-    db = SessionLocal()
+def delete_log(db: Session, log_id: int):
     try:
         log = db.query(HabitLog).filter(HabitLog.id == log_id).first()
         if not log:
-            print(f"Didnt find log with ID {log_id}")
+            logger.warning(f"No se encontró log con ID {log_id}")
             return False
 
         db.delete(log)
         db.commit()
-        print(f"Compliance record (ID: {log_id}) successfully removed")
+        logger.info(f"Registro de cumplimiento (ID: {log_id}) eliminado correctamente")
         return True
 
     except Exception as e:
         db.rollback()
-        print(f"Error removing log: {e}")
+        logger.error(f"Error eliminando log: {e}")
         raise e
-    finally:
-        db.close()

@@ -23,3 +23,11 @@ def init_db():
     Base.metadata.create_all(bind=engine)
     
     print(" > DataBase successfully initialized.\n\n")
+
+def get_db():
+    """Dependency generator for database sessions in FastAPI routes"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

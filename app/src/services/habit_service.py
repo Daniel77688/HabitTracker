@@ -1,8 +1,10 @@
-from src.models.database import SessionLocal
+import logging
+from sqlalchemy.orm import Session
 from src.models.habit_model import Habit, Freq, Status
 
-def create_habit(user_id: int, title: str, description: str = None, frequency_type: Freq = Freq.daily, target_days: list = None):
-    db = SessionLocal()
+logger = logging.getLogger(__name__)
+
+def create_habit(db: Session, user_id: int, title: str, description: str = None, frequency_type: Freq = Freq.daily, target_days: list = None):
     try:
         habit = Habit(
             user_id=user_id,
@@ -15,54 +17,45 @@ def create_habit(user_id: int, title: str, description: str = None, frequency_ty
         db.commit()
         db.refresh(habit)
         
-        print(f"Hábito creado con éxito: {habit}")
+        logger.info(f"Hábito creado con éxito: {habit.title} (ID: {habit.id})")
         return habit
     
     except Exception as e:
         db.rollback()
-        print(f"Error al crear el hábito: {e}")
+        logger.error(f"Error al crear el hábito: {e}")
         raise e
-    finally:
-        db.close()
         
 
-def read_habit(habit_id: int):
-    db = SessionLocal()
+def read_habit(db: Session, habit_id: int):
     try:
         habit = db.query(Habit).filter(Habit.id == habit_id).first()
         if not habit:
-            print(f"No se encontró el hábito con ID: {habit_id}")
+            logger.warning(f"No se encontró el hábito con ID: {habit_id}")
             return None
             
         return habit
     
     except Exception as e:
-        print(f"Error al buscar el hábito: {e}")
+        logger.error(f"Error al buscar el hábito: {e}")
         return None
-    finally:
-        db.close()
 
 
-def get_habits_by_user(user_id: int):
-    db = SessionLocal()
+def get_habits_by_user(db: Session, user_id: int):
     try:
         habits = db.query(Habit).filter(Habit.user_id == user_id).all()
         return habits
     except Exception as e:
-        print(f"Error al listar los hábitos del usuario: {e}")
+        logger.error(f"Error al listar los hábitos del usuario: {e}")
         return []
-    finally:
-        db.close()
         
 
-def update_habit(habit_id: int, title: str = None, description: str = None, frequency_type: Freq = None, target_days: list = None, status: Status = None):
-    db = SessionLocal()
+def update_habit(db: Session, habit_id: int, title: str = None, description: str = None, frequency_type: Freq = None, target_days: list = None, status: Status = None):
     try:
         habit = db.query(Habit).filter(Habit.id == habit_id).first()
         
         if not habit:
-            print(f"No se encontró el hábito con ID: {habit_id}")
-            return False
+            logger.warning(f"No se encontró el hábito con ID: {habit_id}")
+            return None
             
         if title is not None:
             habit.title = title
@@ -78,34 +71,29 @@ def update_habit(habit_id: int, title: str = None, description: str = None, freq
         db.commit()
         db.refresh(habit)
         
-        print(f"Hábito actualizado con éxito: {habit}")
+        logger.info(f"Hábito actualizado con éxito: {habit.title}")
         return habit
         
     except Exception as e:
         db.rollback()
-        print(f"Error al actualizar el hábito: {e}")
+        logger.error(f"Error al actualizar el hábito: {e}")
         raise e
-    finally:
-        db.close()
         
 
-def delete_habit(habit_id: int):
-    db = SessionLocal()
+def delete_habit(db: Session, habit_id: int):
     try:
         habit = db.query(Habit).filter(Habit.id == habit_id).first()
         
         if not habit:
-            print(f"No se encontró el hábito con ID: {habit_id}")
+            logger.warning(f"No se encontró el hábito con ID: {habit_id}")
             return False
             
         db.delete(habit)
         db.commit()        
-        print(f"Hábito con ID {habit_id} eliminado correctamente.")
+        logger.info(f"Hábito con ID {habit_id} eliminado correctamente.")
         return True
     
     except Exception as e:
         db.rollback()
-        print(f"Error al eliminar el hábito: {e}")
+        logger.error(f"Error al eliminar el hábito: {e}")
         raise e
-    finally:
-        db.close()
