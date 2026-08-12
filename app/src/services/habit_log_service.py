@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from typing import Optional
 from sqlalchemy.orm import Session
 from src.models.habit_log_model import HabitLog
 from src.models.habit_model import Habit
@@ -42,6 +43,23 @@ def get_habit_logs(db: Session, habit_id: int):
         return logs
     except Exception as e:
         logger.error(f"Error obteniendo los logs del hábito: {e}")
+        return []
+
+
+def get_logs_by_user(db: Session, user_id: int, from_date: Optional[date] = None, to_date: Optional[date] = None):
+    try:
+        query = (
+            db.query(HabitLog)
+            .join(Habit, HabitLog.habit_id == Habit.id)
+            .filter(Habit.user_id == user_id)
+        )
+        if from_date:
+            query = query.filter(HabitLog.completed_date >= from_date)
+        if to_date:
+            query = query.filter(HabitLog.completed_date <= to_date)
+        return query.order_by(HabitLog.completed_date).all()
+    except Exception as e:
+        logger.error(f"Error obteniendo logs del usuario {user_id}: {e}")
         return []
 
 
