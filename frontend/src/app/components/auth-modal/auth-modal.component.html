@@ -1,0 +1,82 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content fade-in" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="onClose()" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="modal-header">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <h2>{{ activeTab === 'login' ? 'Iniciar sesión' : 'Crear cuenta' }}</h2>
+      <p class="modal-subtitle">
+        {{ activeTab === 'login' ? 'Accede a tus hábitos e historial' : 'Comienza a realizar el seguimiento de tus rutinas' }}
+      </p>
+    </div>
+
+    <div class="tab-switcher">
+      <button class="tab-btn" [class.active]="activeTab === 'login'" (click)="activeTab = 'login'; error = ''">
+        Iniciar sesión
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'register'" (click)="activeTab = 'register'; error = ''">
+        Registrarse
+      </button>
+    </div>
+
+    <div class="alert-error" *ngIf="error">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Login Form -->
+    <form *ngIf="activeTab === 'login'" (ngSubmit)="onLogin()" class="auth-form">
+      <div class="form-field">
+        <label>Usuario o Email</label>
+        <input type="text" class="input-field" placeholder="tu_nombre_de_usuario o email@ejemplo.com"
+               [(ngModel)]="loginForm.username_or_email" name="username_or_email" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label>Contraseña</label>
+        <input type="password" class="input-field" placeholder="••••••••"
+               [(ngModel)]="loginForm.password" name="password" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary submit-btn" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Continuar</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </form>
+
+    <!-- Register Form -->
+    <form *ngIf="activeTab === 'register'" (ngSubmit)="onRegister()" class="auth-form">
+      <div class="form-field">
+        <label>Nombre de usuario</label>
+        <input type="text" class="input-field" placeholder="ej. carlos_m"
+               [(ngModel)]="registerForm.username" name="username" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label>Correo electrónico</label>
+        <input type="email" class="input-field" placeholder="ej. carlos@ejemplo.com"
+               [(ngModel)]="registerForm.email" name="email" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label>Contraseña</label>
+        <input type="password" class="input-field" placeholder="Mínimo 6 caracteres"
+               [(ngModel)]="registerForm.password" name="password" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-primary submit-btn" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Crear cuenta</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </form>
+  </div>
+</div>
