@@ -35,10 +35,29 @@
         <span>{{ currentTheme === 'dark' ? 'Modo claro' : 'Modo oscuro' }}</span>
       </button>
 
-      <div class="user-pill" *ngIf="user">
-        <div class="avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
-        <span class="username">{{ user.username }}</span>
-      </div>
+      <ng-container *ngIf="user; else guestActions">
+        <div class="user-pill">
+          <div class="avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
+          <span class="username">{{ user.username }}</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" (click)="logout()" title="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Salir
+        </button>
+      </ng-container>
+
+      <ng-template #guestActions>
+        <a class="btn btn-secondary btn-sm" routerLink="/">
+          Iniciar sesión
+        </a>
+        <a class="btn btn-primary btn-sm" routerLink="/">
+          Registrarse
+        </a>
+      </ng-template>
     </div>
   </div>
 </header>
@@ -75,10 +94,9 @@
     <div class="controls-bar fade-in">
       <!-- View selector -->
       <div class="view-tabs">
-        <button class="view-tab" [class.active]="view === 'week'"   (click)="view='week';   onViewChange()">Semana</button>
+      <button class="view-tab" [class.active]="view === 'week'"   (click)="view='week';   onViewChange()">Semana</button>
         <button class="view-tab" [class.active]="view === 'month'"  (click)="view='month';  onViewChange()">Mes</button>
         <button class="view-tab" [class.active]="view === 'year'"   (click)="view='year';   onViewChange()">Año</button>
-        <button class="view-tab" [class.active]="view === 'custom'" (click)="view='custom'; onViewChange()">Personalizado</button>
       </div>
 
       <!-- Habit selector -->
@@ -88,23 +106,8 @@
       </select>
     </div>
 
-    <!-- Custom date range inputs -->
-    <div class="custom-range fade-in" *ngIf="view === 'custom'">
-      <div class="range-inputs">
-        <div class="range-field">
-          <label>Desde</label>
-          <input type="date" class="input-field" [(ngModel)]="customFrom">
-        </div>
-        <div class="range-field">
-          <label>Hasta</label>
-          <input type="date" class="input-field" [(ngModel)]="customTo">
-        </div>
-        <button class="btn btn-primary" (click)="onCustomRangeApply()">Aplicar</button>
-      </div>
-    </div>
-
     <!-- Navigation + period label -->
-    <div class="period-nav fade-in" *ngIf="view !== 'custom'">
+    <div class="period-nav fade-in">
       <button class="nav-arrow" (click)="prev()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="15 18 9 12 15 6"/>
@@ -133,8 +136,8 @@
         <span class="stat-num">{{ activeDays }}</span>
         <span class="stat-lbl">Días activos</span>
       </div>
-      <div class="stat-chip">
-        <span class="stat-num">{{ habitName }}</span>
+      <div class="stat-chip filter-chip">
+        <span class="stat-num" [title]="habitName">{{ habitName }}</span>
         <span class="stat-lbl">Filtro</span>
       </div>
     </div>
@@ -145,12 +148,14 @@
       <p>Cargando programación de hábitos...</p>
     </div>
 
-    <!-- ─── WEEK VIEW ──────────────────────────────────────────────────────── -->
     <div class="week-view fade-in" *ngIf="!isLoading && view === 'week'">
       <div class="week-grid">
-        <div class="week-col" *ngFor="let day of weekDays; trackBy: trackByDate">
-          <div class="week-day-name">{{ dayLabels[day.dateObj.getDay() === 0 ? 6 : day.dateObj.getDay() - 1] }}</div>
-          <div class="week-date-num" [class.today]="day.isToday">{{ day.dateObj.getDate() }}</div>
+        <div class="week-col" *ngFor="let day of weekDays; trackBy: trackByDate"
+             [class.is-today-col]="day.isToday">
+          <div class="week-col-header">
+            <div class="week-day-name">{{ dayLabels[day.dateObj.getDay() === 0 ? 6 : day.dateObj.getDay() - 1] }}</div>
+            <div class="week-date-num" [class.today]="day.isToday">{{ day.dateObj.getDate() }}</div>
+          </div>
 
           <div class="week-habits-list">
             <ng-container *ngIf="day.scheduledHabits.length > 0; else noHabitsWeek">
@@ -175,8 +180,9 @@
       </div>
     </div>
 
+
     <!-- ─── MONTH VIEW ─────────────────────────────────────────────────────── -->
-    <div class="month-view fade-in" *ngIf="!isLoading && (view === 'month' || view === 'custom')">
+    <div class="month-view fade-in" *ngIf="!isLoading && view === 'month'">
       <!-- Day headers -->
       <div class="month-header-row">
         <div class="month-day-header" *ngFor="let d of dayLabels">{{ d }}</div>

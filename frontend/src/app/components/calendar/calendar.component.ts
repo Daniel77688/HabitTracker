@@ -7,7 +7,7 @@ import { HabitService } from '../../services/habit.service';
 import { HabitLogService } from '../../services/habit-log.service';
 import { User, Habit, HabitLog } from '../../models/interfaces';
 
-type CalendarView = 'week' | 'month' | 'year' | 'custom';
+type CalendarView = 'week' | 'month' | 'year';
 
 interface DayHabitStatus {
   habit: Habit;
@@ -50,10 +50,6 @@ export class CalendarComponent implements OnInit {
   // Month/Week navigation
   currentDate = new Date();
 
-  // Custom range
-  customFrom = '';
-  customTo = '';
-
   // Computed data
   completedLogsSet: Set<string> = new Set();
   monthDays: CalendarDay[] = [];
@@ -80,11 +76,6 @@ export class CalendarComponent implements OnInit {
     if (this.user) {
       this.loadHabits();
     }
-
-    // set default custom range to current month
-    const now = new Date();
-    this.customFrom = this.toISO(new Date(now.getFullYear(), now.getMonth(), 1));
-    this.customTo   = this.toISO(new Date(now.getFullYear(), now.getMonth() + 1, 0));
   }
 
   logout(): void {
@@ -135,13 +126,11 @@ export class CalendarComponent implements OnInit {
       const from = new Date(d.getFullYear(), d.getMonth(), 1);
       const to   = new Date(d.getFullYear(), d.getMonth() + 1, 0);
       return { from: this.toISO(from), to: this.toISO(to) };
-    } else if (this.view === 'year') {
+    } else {
       return {
         from: `${d.getFullYear()}-01-01`,
         to:   `${d.getFullYear()}-12-31`
       };
-    } else {
-      return { from: this.customFrom, to: this.customTo };
     }
   }
 
@@ -264,10 +253,6 @@ export class CalendarComponent implements OnInit {
     this.buildView();
   }
 
-  onCustomRangeApply(): void {
-    if (this.customFrom && this.customTo) this.loadLogs();
-  }
-
   // ─── Helpers ──────────────────────────────────────────────────────────────
   getMonday(d: Date): Date {
     const day = d.getDay();
@@ -289,15 +274,13 @@ export class CalendarComponent implements OnInit {
       return `${mon.getDate()} ${this.monthNames[mon.getMonth()].slice(0,3)} – ${sun.getDate()} ${this.monthNames[sun.getMonth()].slice(0,3)} ${sun.getFullYear()}`;
     }
     if (this.view === 'month') return `${this.monthNames[d.getMonth()]} ${d.getFullYear()}`;
-    if (this.view === 'year')  return `${d.getFullYear()}`;
-    return `${this.customFrom} → ${this.customTo}`;
+    return `${d.getFullYear()}`;
   }
 
   buildView(): void {
-    if (this.view === 'week')   this.buildWeek();
-    if (this.view === 'month')  this.buildMonth();
-    if (this.view === 'year')   this.buildYear();
-    if (this.view === 'custom') this.buildMonth();
+    if (this.view === 'week')  this.buildWeek();
+    if (this.view === 'month') this.buildMonth();
+    if (this.view === 'year')  this.buildYear();
   }
 
   buildWeek(): void {
@@ -311,9 +294,7 @@ export class CalendarComponent implements OnInit {
   }
 
   buildMonth(): void {
-    const d = this.view === 'custom'
-      ? new Date(this.customFrom)
-      : new Date(this.currentDate);
+    const d = new Date(this.currentDate);
     const year = d.getFullYear();
     const month = d.getMonth();
 
