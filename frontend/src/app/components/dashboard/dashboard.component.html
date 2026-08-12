@@ -1,0 +1,378 @@
+<!-- Top Navbar -->
+<header class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <span class="brand-title">Habit<span class="brand-sub">Tracker</span></span>
+    </div>
+
+    <div class="nav-right">
+      <button class="btn btn-ghost btn-sm theme-toggle-btn" (click)="toggleTheme()" [title]="currentTheme === 'dark' ? 'Cambiar a modo claro (Crema)' : 'Cambiar a modo oscuro (Gris)'">
+        <svg *ngIf="currentTheme === 'dark'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg *ngIf="currentTheme === 'light'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <span>{{ currentTheme === 'dark' ? 'Modo claro' : 'Modo oscuro' }}</span>
+      </button>
+
+      <ng-container *ngIf="user; else guestActions">
+
+        <div class="user-pill">
+          <div class="avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
+          <span class="username">{{ user.username }}</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" (click)="logout()" title="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Salir
+        </button>
+      </ng-container>
+
+      <ng-template #guestActions>
+        <button class="btn btn-secondary btn-sm" (click)="showAuthModal = true">
+          Iniciar sesión
+        </button>
+        <button class="btn btn-primary btn-sm" (click)="showAuthModal = true">
+          Registrarse
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</header>
+
+<!-- Guest Hero View -->
+<section class="landing-hero" *ngIf="!user">
+  <div class="hero-container fade-in">
+    <div class="hero-tag">
+      <span class="dot"></span>
+      Sistema de seguimiento de rutinas
+    </div>
+    <h1>Construye hábitos sostenibles con precisión.</h1>
+    <p class="hero-copy">
+      Diseña rutinas diarias, semanales o personalizadas. Controla tu progreso con métricas claras y mantén la constancia día a día.
+    </p>
+
+    <div class="hero-cta">
+      <button class="btn btn-primary btn-lg" (click)="showAuthModal = true">
+        Crear cuenta gratis
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Feature Grid -->
+    <div class="hero-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <h3>Frecuencias a medida</h3>
+        <p>Configura hábitos diarios, semanales, mensuales o por días específicos de la semana.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+          </svg>
+        </div>
+        <h3>Rachas e historial</h3>
+        <p>Monitorea tu racha actual y tu racha más larga sin interrupciones ni distracciones.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h3>Sin barreras</h3>
+        <p>Explora la plataforma libremente. Solo registras tu cuenta cuando quieras crear hábitos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Authenticated Dashboard -->
+<main class="app-dashboard" *ngIf="user">
+  <div class="dashboard-container">
+    
+    <!-- Top Bar Overview -->
+    <div class="dashboard-header fade-in">
+      <div class="header-titles">
+        <h1>Panel de Hábitos</h1>
+        <p>Seguimiento diario de tus objetivos y rutinas</p>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nuevo hábito
+      </button>
+    </div>
+
+    <!-- Analytics Cards -->
+    <div class="metrics-grid fade-in">
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-title">Hábitos activos</span>
+          <div class="metric-badge">Total</div>
+        </div>
+        <div class="metric-body">
+          <span class="metric-number font-mono">{{ totalActiveCount }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-title">Completados hoy</span>
+          <div class="metric-badge green">Hoy</div>
+        </div>
+        <div class="metric-body">
+          <span class="metric-number font-mono">{{ completedTodayCount }}</span>
+          <span class="metric-sub">de {{ totalActiveCount }} activos</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-title">Racha total acumulada</span>
+          <div class="metric-badge amber">Días</div>
+        </div>
+        <div class="metric-body">
+          <span class="metric-number font-mono">{{ totalStreaks }}</span>
+          <span class="metric-sub">días seguidos</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-title">Mejor racha histórica</span>
+          <div class="metric-badge indigo">Récord</div>
+        </div>
+        <div class="metric-body">
+          <span class="metric-number font-mono">{{ bestStreak }}</span>
+          <span class="metric-sub">máximo alcanzado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Habit Inline Drawer / Card -->
+    <div class="create-card fade-in" *ngIf="showCreateForm">
+      <div class="create-card-header">
+        <h2>Crear nuevo hábito</h2>
+        <button class="close-btn" (click)="resetForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field full-width">
+          <label>Nombre del hábito *</label>
+          <input type="text" class="input-field" placeholder="ej. Meditar 15 minutos por la mañana" [(ngModel)]="newHabit.title">
+        </div>
+
+        <div class="form-field full-width">
+          <label>Descripción o nota adicional (opcional)</label>
+          <input type="text" class="input-field" placeholder="ej. Utilizar app de respiración antes de trabajar" [(ngModel)]="newHabit.description">
+        </div>
+
+        <div class="form-field full-width">
+          <label>Frecuencia de repetición</label>
+          <div class="freq-grid">
+            <button *ngFor="let opt of frequencyOptions" 
+                    class="freq-card" 
+                    [class.selected]="newHabit.frequency_type === opt.value"
+                    (click)="newHabit.frequency_type = opt.value">
+              <span class="freq-name">{{ opt.label }}</span>
+              <span class="freq-desc">{{ opt.desc }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom days selector -->
+        <div class="form-field full-width" *ngIf="newHabit.frequency_type === 'custom'">
+          <label>Selecciona los días específicos</label>
+          <div class="days-picker">
+            <button *ngFor="let day of dayLabels"
+                    class="day-pill"
+                    [class.selected]="newHabit.target_days.includes(day.index)"
+                    (click)="toggleDay(day.index)">
+              {{ day.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="create-card-footer">
+        <button class="btn btn-ghost" (click)="resetForm()">Cancelar</button>
+        <button class="btn btn-primary" (click)="createHabit()" [disabled]="!newHabit.title.trim()">
+          Guardar hábito
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter & View Switcher Bar -->
+    <div class="controls-bar fade-in">
+      <div class="tabs-group">
+        <button class="tab-item" [class.active]="activeTab === 'active'" (click)="activeTab = 'active'">
+          Activos
+          <span class="count-pill">{{ totalActiveCount }}</span>
+        </button>
+        <button class="tab-item" [class.active]="activeTab === 'archived'" (click)="activeTab = 'archived'">
+          Archivados
+          <span class="count-pill">{{ totalArchivedCount }}</span>
+        </button>
+      </div>
+
+      <div class="search-filter-group" *ngIf="activeTab === 'active'">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" placeholder="Buscar hábito..." [(ngModel)]="searchQuery">
+        </div>
+
+        <select class="select-filter" [(ngModel)]="selectedFrequency">
+          <option value="all">Todas las frecuencias</option>
+          <option value="daily">Diarios</option>
+          <option value="weekly">Semanales</option>
+          <option value="monthly">Mensuales</option>
+          <option value="custom">Personalizados</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="state-container" *ngIf="isLoading">
+      <div class="spinner-lg"></div>
+      <p>Cargando información...</p>
+    </div>
+
+    <!-- Active Habits List -->
+    <div class="content-section" *ngIf="!isLoading && activeTab === 'active'">
+      <div class="habits-grid" *ngIf="filteredActiveHabits.length > 0; else noActiveTemplate">
+        <app-habit-card
+          *ngFor="let habit of filteredActiveHabits; let i = index"
+          [habit]="habit"
+          [streak]="streaks.get(habit.id)"
+          [animationDelay]="i * 40"
+          (complete)="onHabitCompleted($event)"
+          (delete)="onHabitDeleted($event)"
+          (archive)="onHabitArchived($event)">
+        </app-habit-card>
+      </div>
+
+      <ng-template #noActiveTemplate>
+        <div class="empty-placeholder fade-in">
+          <div class="placeholder-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <h3>No hay hábitos activos</h3>
+          <p *ngIf="searchQuery || selectedFrequency !== 'all'">No se encontraron hábitos que coincidan con los filtros aplicados.</p>
+          <p *ngIf="!searchQuery && selectedFrequency === 'all'">Comienza añadiendo tu primer hábito para realizar el seguimiento.</p>
+          <button class="btn btn-primary" (click)="openCreate()" *ngIf="!searchQuery && selectedFrequency === 'all'">
+            Crear mi primer hábito
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Archived Habits List -->
+    <div class="content-section" *ngIf="!isLoading && activeTab === 'archived'">
+      <div class="habits-grid" *ngIf="filteredArchivedHabits.length > 0; else noArchivedTemplate">
+        <app-habit-card
+          *ngFor="let habit of filteredArchivedHabits; let i = index"
+          [habit]="habit"
+          [streak]="streaks.get(habit.id)"
+          [animationDelay]="i * 40"
+          (delete)="onHabitDeleted($event)"
+          (unarchive)="onHabitUnarchived($event)">
+        </app-habit-card>
+      </div>
+
+      <ng-template #noArchivedTemplate>
+        <div class="empty-placeholder fade-in">
+          <div class="placeholder-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="21 8 21 21 3 21 3 8"/>
+              <rect x="1" y="3" width="22" height="5"/>
+              <line x1="10" y1="12" x2="14" y2="12"/>
+            </svg>
+          </div>
+          <h3>No hay hábitos archivados</h3>
+          <p>Los hábitos que desactives se moverán aquí para consultar su historial cuando quieras.</p>
+        </div>
+      </ng-template>
+    </div>
+
+  </div>
+</main>
+
+<!-- Auth Modal Component -->
+<app-auth-modal
+  *ngIf="showAuthModal"
+  (close)="showAuthModal = false"
+  (authenticated)="onAuthenticated($event)">
+</app-auth-modal>
+
+<!-- Custom In-App Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteConfirmModal" (click)="cancelDeleteHabit()">
+  <div class="delete-modal-card fade-in" (click)="$event.stopPropagation()">
+    <div class="delete-modal-header">
+      <div class="danger-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          <line x1="10" y1="11" x2="10" y2="17"/>
+          <line x1="14" y1="11" x2="14" y2="17"/>
+        </svg>
+      </div>
+      <div>
+        <h3>¿Eliminar hábito?</h3>
+        <p class="delete-subtitle">Esta acción no se puede deshacer.</p>
+      </div>
+    </div>
+
+    <div class="delete-modal-body" *ngIf="habitToDelete">
+      <p>Vas a eliminar permanentemente el hábito <strong>"{{ habitToDelete.title }}"</strong> y todas sus rachas registradas.</p>
+    </div>
+
+    <div class="delete-modal-actions">
+      <button class="btn btn-secondary" (click)="cancelDeleteHabit()">Cancelar</button>
+      <button class="btn btn-danger" (click)="confirmDeleteHabit()">Sí, eliminar hábito</button>
+    </div>
+  </div>
+</div>
+
