@@ -1,66 +1,75 @@
 // ─── Navbar ──────────────────────────────────────────────────────────────────
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32px;
-  height: 60px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface-0);
+  border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .nav-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  text-decoration: none;
+}
 
-  .brand-logo {
-    width: 32px;
-    height: 32px;
-    background: var(--accent-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    svg { width: 18px; height: 18px; stroke: #fff; }
-  }
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-indigo);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  .brand-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.3px;
+  svg {
+    width: 18px;
+    height: 18px;
   }
-  .brand-sub { color: var(--accent-primary); }
+}
+
+.brand-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.brand-sub {
+  color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 .nav-center {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 
   .nav-link {
     padding: 6px 14px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
     text-decoration: none;
     border-bottom: 2px solid transparent;
     transition: all 0.15s;
 
-    &:hover { color: var(--text-primary); }
+    &:hover {
+      color: var(--text-primary);
+    }
+
     &.active {
-      color: var(--accent-primary);
-      border-bottom-color: var(--accent-primary);
+      color: var(--accent-indigo);
+      border-bottom-color: var(--accent-indigo);
     }
   }
 }
@@ -68,40 +77,36 @@
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.theme-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  svg { width: 16px; height: 16px; }
+  gap: 12px;
 }
 
 .user-pill {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 12px 4px 4px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
+  padding: 4px 10px;
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+}
 
-  .avatar {
-    width: 28px;
-    height: 28px;
-    background: var(--accent-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #fff;
-  }
-  .username {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-primary);
-  }
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-indigo-light);
+  color: var(--accent-indigo);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.username {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 // ─── Auth gate ────────────────────────────────────────────────────────────────

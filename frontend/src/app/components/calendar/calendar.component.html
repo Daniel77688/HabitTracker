@@ -1,4 +1,4 @@
-<!-- Navbar (reutilizado del dashboard) -->
+<!-- Top Navbar (Misma estructura que Panel) -->
 <header class="navbar">
   <div class="nav-container">
     <div class="nav-brand">
@@ -17,12 +17,16 @@
     </div>
 
     <div class="nav-right">
-      <button class="btn btn-ghost btn-sm theme-toggle-btn" (click)="toggleTheme()">
+      <button class="btn btn-ghost btn-sm theme-toggle-btn" (click)="toggleTheme()" [title]="currentTheme === 'dark' ? 'Cambiar a modo claro (Crema)' : 'Cambiar a modo oscuro (Gris)'">
         <svg *ngIf="currentTheme === 'dark'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
         <svg *ngIf="currentTheme === 'light'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -30,6 +34,7 @@
         </svg>
         <span>{{ currentTheme === 'dark' ? 'Modo claro' : 'Modo oscuro' }}</span>
       </button>
+
       <div class="user-pill" *ngIf="user">
         <div class="avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
         <span class="username">{{ user.username }}</span>
