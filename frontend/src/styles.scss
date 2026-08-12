@@ -35,6 +35,20 @@
   --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
   --shadow-glow: 0 0 20px -3px rgba(99, 102, 241, 0.25);
+
+  /* Indigo accent (used by dashboard) */
+  --accent-indigo: #818cf8;
+  --accent-indigo-light: rgba(129, 140, 248, 0.15);
+
+  /* Aliases used by calendar component */
+  --accent-primary: #6366f1;
+  --accent-rgb: 99, 102, 241;
+  --bg-primary: #1a1b20;
+  --bg-card: #22232a;
+  --bg-card-hover: #282932;
+  --bg-secondary: #1f2027;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-muted: #6b7280;
 }
 
 /* Light Theme: Crema cálido con alto contraste y acentos en VERDE */
@@ -72,6 +86,19 @@
   --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-glow: 0 0 20px -3px rgba(5, 150, 105, 0.25);
+
+  /* Indigo accent (used by dashboard) */
+  --accent-indigo: #059669;
+  --accent-indigo-light: rgba(5, 150, 105, 0.14);
+
+  /* Aliases used by calendar component */
+  --accent-rgb: 5, 150, 105;
+  --bg-primary: #f4f0e6;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f6f1;
+  --bg-secondary: #f0ece0;
+  --border-color: #d6cfbe;
+  --text-muted: #94a3b8;
 }
 
 
@@ -82,6 +109,113 @@
   padding: 0;
   border-radius: 0 !important;
 }
+
+/* ─── Shared Navbar (used by Dashboard + Calendar) ───────────────────────── */
+.navbar {
+  background: var(--bg-surface-0);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  background: var(--accent-indigo);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg { width: 18px; height: 18px; }
+}
+
+.brand-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.brand-sub {
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.nav-center {
+  display: flex;
+  gap: 6px;
+
+  .nav-link {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+
+    &:hover  { color: var(--text-primary); }
+    &.active { color: var(--accent-indigo); border-bottom-color: var(--accent-indigo); }
+  }
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-indigo-light);
+  color: var(--accent-indigo);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.username {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.theme-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 
 html {
   font-size: 15px;

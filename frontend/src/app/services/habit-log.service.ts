@@ -14,10 +14,6 @@ export class HabitLogService {
     return this.http.post<HabitLog>(this.apiUrl + '/', data);
   }
 
-  getLogsByHabit(habitId: number): Observable<HabitLog[]> {
-    return this.http.get<HabitLog[]>(`${this.apiUrl}/habit/${habitId}`);
-  }
-
   getLogsByUser(userId: number, fromDate?: string, toDate?: string): Observable<HabitLog[]> {
     let params = new HttpParams();
     if (fromDate) params = params.set('from_date', fromDate);

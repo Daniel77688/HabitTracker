@@ -87,6 +87,13 @@ export class CalendarComponent implements OnInit {
     this.customTo   = this.toISO(new Date(now.getFullYear(), now.getMonth() + 1, 0));
   }
 
+  logout(): void {
+    this.authService.logout();
+    this.user = null;
+    this.habits = [];
+    this.logs = [];
+  }
+
   toggleTheme(): void {
     this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', this.currentTheme);
@@ -252,16 +259,7 @@ export class CalendarComponent implements OnInit {
   }
 
   onHabitSelect(val: any): void {
-    if (val === 'all') {
-      this.selectedHabitId = 'all';
-    } else {
-      this.selectedHabitId = Number(val);
-    }
-    this.buildDayMap();
-    this.buildView();
-  }
-
-  onHabitChange(): void {
+    this.selectedHabitId = val === 'all' ? 'all' : Number(val);
     this.buildDayMap();
     this.buildView();
   }
