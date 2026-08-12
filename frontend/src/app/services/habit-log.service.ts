@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { HabitLog, HabitLogCreate } from '../models/interfaces';
 import { environment } from '../../environments/environment';
@@ -16,6 +16,13 @@ export class HabitLogService {
 
   getLogsByHabit(habitId: number): Observable<HabitLog[]> {
     return this.http.get<HabitLog[]>(`${this.apiUrl}/habit/${habitId}`);
+  }
+
+  getLogsByUser(userId: number, fromDate?: string, toDate?: string): Observable<HabitLog[]> {
+    let params = new HttpParams();
+    if (fromDate) params = params.set('from_date', fromDate);
+    if (toDate)   params = params.set('to_date', toDate);
+    return this.http.get<HabitLog[]>(`${this.apiUrl}/user/${userId}`, { params });
   }
 
   deleteLog(logId: number): Observable<any> {
