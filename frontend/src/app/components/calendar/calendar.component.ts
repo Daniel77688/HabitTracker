@@ -251,6 +251,16 @@ export class CalendarComponent implements OnInit {
     this.loadLogs();
   }
 
+  onHabitSelect(val: any): void {
+    if (val === 'all') {
+      this.selectedHabitId = 'all';
+    } else {
+      this.selectedHabitId = Number(val);
+    }
+    this.buildDayMap();
+    this.buildView();
+  }
+
   onHabitChange(): void {
     this.buildDayMap();
     this.buildView();
