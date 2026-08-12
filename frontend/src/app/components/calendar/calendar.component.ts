@@ -9,10 +9,17 @@ import { User, Habit, HabitLog } from '../../models/interfaces';
 
 type CalendarView = 'week' | 'month' | 'year' | 'custom';
 
+interface DayHabitStatus {
+  habit: Habit;
+  completed: boolean;
+}
+
 interface CalendarDay {
   date: string;        // YYYY-MM-DD
   dateObj: Date;
-  count: number;       // nº de hábitos completados ese día
+  scheduledHabits: DayHabitStatus[];
+  completedCount: number;
+  totalScheduled: number;
   isToday: boolean;
   isCurrentMonth: boolean;
   isInRange: boolean;
@@ -48,7 +55,7 @@ export class CalendarComponent implements OnInit {
   customTo = '';
 
   // Computed data
-  dayMap: Map<string, number> = new Map();
+  completedLogsSet: Set<string> = new Set();
   monthDays: CalendarDay[] = [];
   weekDays: CalendarDay[] = [];
   yearData: CalendarDay[][] = []; // 7 rows × 52+ cols
@@ -132,119 +139,86 @@ export class CalendarComponent implements OnInit {
   }
 
   buildDayMap(): void {
-    this.dayMap = new Map();
+    this.completedLogsSet = new Set();
     const filtered = this.selectedHabitId === 'all'
       ? this.logs
       : this.logs.filter(l => l.habit_id === this.selectedHabitId);
     for (const log of filtered) {
-      const key = log.completed_date;
-      this.dayMap.set(key, (this.dayMap.get(key) ?? 0) + 1);
+      // Key format: "habitId_YYYY-MM-DD"
+      this.completedLogsSet.add(`${log.habit_id}_${log.completed_date}`);
     }
   }
 
-  buildView(): void {
-    if (this.view === 'week')   this.buildWeek();
-    if (this.view === 'month')  this.buildMonth();
-    if (this.view === 'year')   this.buildYear();
-    if (this.view === 'custom') this.buildMonth();
-  }
+  isHabitScheduledForDate(habit: Habit, date: Date): boolean {
+    const dayOfWeek = (date.getDay() + 6) % 7; // 0 = Mon, 6 = Sun
+    const dayOfMonth = date.getDate();
 
-  buildWeek(): void {
-    const mon = this.getMonday(new Date(this.currentDate));
-    this.weekDays = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(mon);
-      d.setDate(mon.getDate() + i);
-      this.weekDays.push(this.makeDay(d, true));
-    }
-  }
-
-  buildMonth(): void {
-    const d = this.view === 'custom'
-      ? new Date(this.customFrom)
-      : new Date(this.currentDate);
-    const year = d.getFullYear();
-    const month = d.getMonth();
-
-    const firstDay = new Date(year, month, 1);
-    const lastDay  = new Date(year, month + 1, 0);
-
-    // pad start to Monday
-    let startPad = firstDay.getDay() - 1;
-    if (startPad < 0) startPad = 6;
-
-    this.monthDays = [];
-    for (let i = startPad; i > 0; i--) {
-      const pd = new Date(firstDay); pd.setDate(pd.getDate() - i);
-      this.monthDays.push(this.makeDay(pd, false));
-    }
-    for (let i = 1; i <= lastDay.getDate(); i++) {
-      this.monthDays.push(this.makeDay(new Date(year, month, i), true));
-    }
-    // pad end to complete last row
-    const endPad = 7 - (this.monthDays.length % 7);
-    if (endPad < 7) {
-      for (let i = 1; i <= endPad; i++) {
-        const nd = new Date(lastDay); nd.setDate(nd.getDate() + i);
-        this.monthDays.push(this.makeDay(nd, false));
-      }
-    }
-  }
-
-  buildYear(): void {
-    const year = this.currentDate.getFullYear();
-    // start from Monday of the week containing Jan 1
-    const jan1 = new Date(year, 0, 1);
-    let startMon = this.getMonday(jan1);
-
-    // collect all days until end of year
-    const dec31 = new Date(year, 11, 31);
-    const allDays: CalendarDay[] = [];
-    const cursor = new Date(startMon);
-    while (cursor <= dec31 || allDays.length % 7 !== 0) {
-      allDays.push(this.makeDay(new Date(cursor), cursor.getFullYear() === year));
-      cursor.setDate(cursor.getDate() + 1);
-      if (allDays.length > 400) break;
-    }
-
-    // split into 7 rows (Mon–Sun) × n cols
-    const cols = Math.ceil(allDays.length / 7);
-    this.yearData = Array.from({ length: 7 }, () => [] as CalendarDay[]);
-    for (let i = 0; i < allDays.length; i++) {
-      this.yearData[i % 7].push(allDays[i]);
-    }
-
-    // month labels for the X axis
-    this.yearMonthLabels = [];
-    let lastMonth = -1;
-    for (let col = 0; col < this.yearData[0].length; col++) {
-      const day = this.yearData[0][col];
-      if (day && day.dateObj.getMonth() !== lastMonth && day.dateObj.getFullYear() === year) {
-        this.yearMonthLabels.push({ label: this.monthNames[day.dateObj.getMonth()].slice(0, 3), col });
-        lastMonth = day.dateObj.getMonth();
-      }
+    switch (habit.frequency_type) {
+      case 'daily':
+        return true;
+      case 'weekly':
+        // Scheduled on Monday by default unless target_days specifies
+        if (habit.target_days && habit.target_days.length > 0) {
+          return habit.target_days.includes(dayOfWeek);
+        }
+        return dayOfWeek === 0;
+      case 'monthly':
+        // Scheduled on the 1st of the month unless target_days specifies
+        if (habit.target_days && habit.target_days.length > 0) {
+          return habit.target_days.includes(dayOfMonth);
+        }
+        return dayOfMonth === 1;
+      case 'custom':
+        if (habit.target_days && habit.target_days.length > 0) {
+          return habit.target_days.includes(dayOfWeek);
+        }
+        return true;
+      default:
+        return true;
     }
   }
 
   makeDay(d: Date, inRange: boolean): CalendarDay {
     const key = this.toISO(d);
     const today = this.toISO(new Date());
+
+    const activeHabitsToConsider = this.selectedHabitId === 'all'
+      ? this.habits
+      : this.habits.filter(h => h.id === this.selectedHabitId);
+
+    const scheduledHabits: DayHabitStatus[] = [];
+    let completedCount = 0;
+
+    for (const habit of activeHabitsToConsider) {
+      if (this.isHabitScheduledForDate(habit, d)) {
+        const isCompleted = this.completedLogsSet.has(`${habit.id}_${key}`);
+        if (isCompleted) completedCount++;
+        scheduledHabits.push({
+          habit,
+          completed: isCompleted
+        });
+      }
+    }
+
     return {
       date: key,
       dateObj: d,
-      count: this.dayMap.get(key) ?? 0,
+      scheduledHabits,
+      completedCount,
+      totalScheduled: scheduledHabits.length,
       isToday: key === today,
       isCurrentMonth: d.getMonth() === this.currentDate.getMonth(),
       isInRange: inRange
     };
   }
 
-  // ─── Intensity helper (0–4) ───────────────────────────────────────────────
-  intensity(count: number): number {
-    if (count === 0) return 0;
-    if (count === 1) return 1;
-    if (count === 2) return 2;
-    if (count <= 4)  return 3;
+  intensity(day: CalendarDay): number {
+    if (day.totalScheduled === 0) return 0;
+    const ratio = day.completedCount / day.totalScheduled;
+    if (day.completedCount === 0) return 0;
+    if (ratio < 0.35) return 1;
+    if (ratio < 0.70) return 2;
+    if (ratio < 1)    return 3;
     return 4;
   }
 
@@ -311,14 +285,96 @@ export class CalendarComponent implements OnInit {
     return `${this.customFrom} → ${this.customTo}`;
   }
 
+  buildView(): void {
+    if (this.view === 'week')   this.buildWeek();
+    if (this.view === 'month')  this.buildMonth();
+    if (this.view === 'year')   this.buildYear();
+    if (this.view === 'custom') this.buildMonth();
+  }
+
+  buildWeek(): void {
+    const mon = this.getMonday(new Date(this.currentDate));
+    this.weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(mon);
+      d.setDate(mon.getDate() + i);
+      this.weekDays.push(this.makeDay(d, true));
+    }
+  }
+
+  buildMonth(): void {
+    const d = this.view === 'custom'
+      ? new Date(this.customFrom)
+      : new Date(this.currentDate);
+    const year = d.getFullYear();
+    const month = d.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay  = new Date(year, month + 1, 0);
+
+    let startPad = firstDay.getDay() - 1;
+    if (startPad < 0) startPad = 6;
+
+    this.monthDays = [];
+    for (let i = startPad; i > 0; i--) {
+      const pd = new Date(firstDay); pd.setDate(pd.getDate() - i);
+      this.monthDays.push(this.makeDay(pd, false));
+    }
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+      this.monthDays.push(this.makeDay(new Date(year, month, i), true));
+    }
+    const endPad = 7 - (this.monthDays.length % 7);
+    if (endPad < 7) {
+      for (let i = 1; i <= endPad; i++) {
+        const nd = new Date(lastDay); nd.setDate(nd.getDate() + i);
+        this.monthDays.push(this.makeDay(nd, false));
+      }
+    }
+  }
+
+  buildYear(): void {
+    const year = this.currentDate.getFullYear();
+    const jan1 = new Date(year, 0, 1);
+    let startMon = this.getMonday(jan1);
+
+    const dec31 = new Date(year, 11, 31);
+    const allDays: CalendarDay[] = [];
+    const cursor = new Date(startMon);
+    while (cursor <= dec31 || allDays.length % 7 !== 0) {
+      allDays.push(this.makeDay(new Date(cursor), cursor.getFullYear() === year));
+      cursor.setDate(cursor.getDate() + 1);
+      if (allDays.length > 400) break;
+    }
+
+    this.yearData = Array.from({ length: 7 }, () => [] as CalendarDay[]);
+    for (let i = 0; i < allDays.length; i++) {
+      this.yearData[i % 7].push(allDays[i]);
+    }
+
+    this.yearMonthLabels = [];
+    let lastMonth = -1;
+    for (let col = 0; col < this.yearData[0].length; col++) {
+      const day = this.yearData[0][col];
+      if (day && day.dateObj.getMonth() !== lastMonth && day.dateObj.getFullYear() === year) {
+        this.yearMonthLabels.push({ label: this.monthNames[day.dateObj.getMonth()].slice(0, 3), col });
+        lastMonth = day.dateObj.getMonth();
+      }
+    }
+  }
+
+  get totalScheduledInView(): number {
+    const days = this.view === 'week' ? this.weekDays : (this.view === 'year' ? this.yearData.flat() : this.monthDays);
+    return days.filter(d => d.isInRange).reduce((sum, d) => sum + d.totalScheduled, 0);
+  }
+
   get totalCompletions(): number {
-    let total = 0;
-    this.dayMap.forEach(v => total += v);
-    return total;
+    const days = this.view === 'week' ? this.weekDays : (this.view === 'year' ? this.yearData.flat() : this.monthDays);
+    return days.filter(d => d.isInRange).reduce((sum, d) => sum + d.completedCount, 0);
   }
 
   get activeDays(): number {
-    return this.dayMap.size;
+    const days = this.view === 'week' ? this.weekDays : (this.view === 'year' ? this.yearData.flat() : this.monthDays);
+    return days.filter(d => d.isInRange && d.completedCount > 0).length;
   }
 
   get weekRows(): CalendarDay[][] {

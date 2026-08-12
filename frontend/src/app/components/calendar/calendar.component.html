@@ -117,6 +117,10 @@
     <!-- Stats row -->
     <div class="stats-row fade-in">
       <div class="stat-chip">
+        <span class="stat-num">{{ totalScheduledInView }}</span>
+        <span class="stat-lbl">Programados</span>
+      </div>
+      <div class="stat-chip">
         <span class="stat-num">{{ totalCompletions }}</span>
         <span class="stat-lbl">Completados</span>
       </div>
@@ -133,7 +137,7 @@
     <!-- Loading -->
     <div class="state-container" *ngIf="isLoading">
       <div class="spinner-lg"></div>
-      <p>Cargando historial...</p>
+      <p>Cargando programación de hábitos...</p>
     </div>
 
     <!-- ─── WEEK VIEW ──────────────────────────────────────────────────────── -->
@@ -143,21 +147,24 @@
           <div class="week-day-name">{{ dayLabels[day.dateObj.getDay() === 0 ? 6 : day.dateObj.getDay() - 1] }}</div>
           <div class="week-date-num" [class.today]="day.isToday">{{ day.dateObj.getDate() }}</div>
 
-          <div class="week-habits">
-            <ng-container *ngIf="day.count > 0; else noneWeek">
-              <div class="habit-dot completed" *ngFor="let i of [].constructor(day.count)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="m9 12 2 2 4-4"/>
-                </svg>
+          <div class="week-habits-list">
+            <ng-container *ngIf="day.scheduledHabits.length > 0; else noHabitsWeek">
+              <div class="week-habit-item"
+                   *ngFor="let item of day.scheduledHabits"
+                   [class.is-completed]="item.completed"
+                   [title]="item.habit.title + (item.completed ? ' (Completado)' : ' (Pendiente)')">
+                <span class="habit-status-icon">
+                  <svg *ngIf="item.completed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span *ngIf="!item.completed" class="pending-dot"></span>
+                </span>
+                <span class="habit-item-title">{{ item.habit.title }}</span>
               </div>
             </ng-container>
-            <ng-template #noneWeek>
-              <div class="habit-dot empty"></div>
+            <ng-template #noHabitsWeek>
+              <div class="no-habits-text">Sin hábitos</div>
             </ng-template>
-          </div>
-
-          <div class="week-count" [class.has-count]="day.count > 0">
-            {{ day.count > 0 ? day.count + (day.count === 1 ? ' hábito' : ' hábitos') : '—' }}
           </div>
         </div>
       </div>
@@ -175,11 +182,23 @@
              *ngFor="let day of row; trackBy: trackByDate"
              [class.today]="day.isToday"
              [class.out-of-month]="!day.isCurrentMonth"
-             [class.has-activity]="day.count > 0"
-             [attr.data-intensity]="intensity(day.count)">
-          <div class="cell-date">{{ day.dateObj.getDate() }}</div>
-          <div class="cell-dots" *ngIf="day.count > 0">
-            <span class="cell-count">{{ day.count }}</span>
+             [class.has-scheduled]="day.totalScheduled > 0"
+             [attr.data-intensity]="intensity(day)">
+          <div class="cell-top">
+            <span class="cell-date">{{ day.dateObj.getDate() }}</span>
+            <span class="cell-badge" *ngIf="day.totalScheduled > 0">
+              {{ day.completedCount }}/{{ day.totalScheduled }}
+            </span>
+          </div>
+
+          <div class="cell-habits-list">
+            <div class="cell-habit-tag"
+                 *ngFor="let item of day.scheduledHabits"
+                 [class.completed]="item.completed"
+                 [title]="item.habit.title + (item.completed ? ' (Completado)' : ' (Pendiente)')">
+              <span class="tag-status"></span>
+              <span class="tag-title">{{ item.habit.title }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -213,8 +232,8 @@
               <div class="heatmap-cell"
                    *ngFor="let row of yearData; trackBy: trackByIndex"
                    [class.out-of-year]="!row[ci].isInRange"
-                   [attr.data-intensity]="intensity(row[ci].count)"
-                   [title]="row[ci].date + ': ' + row[ci].count + ' completados'">
+                   [attr.data-intensity]="intensity(row[ci])"
+                   [title]="row[ci].date + ': ' + row[ci].completedCount + '/' + row[ci].totalScheduled + ' completados'">
               </div>
             </div>
           </div>
@@ -222,13 +241,13 @@
 
         <!-- Legend -->
         <div class="heatmap-legend">
-          <span>Menos</span>
+          <span>0% completado</span>
           <div class="legend-cell" data-intensity="0"></div>
           <div class="legend-cell" data-intensity="1"></div>
           <div class="legend-cell" data-intensity="2"></div>
           <div class="legend-cell" data-intensity="3"></div>
           <div class="legend-cell" data-intensity="4"></div>
-          <span>Más</span>
+          <span>100% completado</span>
         </div>
       </div>
     </div>

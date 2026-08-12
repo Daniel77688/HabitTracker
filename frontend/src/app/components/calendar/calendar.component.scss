@@ -335,10 +335,10 @@
 .week-col {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 20px 8px;
+  align-items: stretch;
+  padding: 16px 8px;
   border-right: 1px solid var(--border-color);
-  gap: 8px;
+  gap: 10px;
 
   &:last-child { border-right: none; }
 }
@@ -349,56 +349,89 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 .week-date-num {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
 
   &.today {
     background: var(--accent-primary);
     color: #fff;
-    border-radius: 0;
   }
 }
 
-.week-habits {
+.week-habits-list {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px;
-  min-height: 40px;
-  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 120px;
 }
 
-.habit-dot {
-  width: 28px;
-  height: 28px;
+.week-habit-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  &.completed {
-    background: var(--accent-primary);
-    svg { width: 14px; height: 14px; stroke: #fff; }
-  }
-  &.empty {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-  }
-}
-
-.week-count {
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   font-size: 0.75rem;
-  color: var(--text-muted);
 
-  &.has-count { color: var(--accent-primary); font-weight: 600; }
+  &.is-completed {
+    background: rgba(var(--accent-rgb), 0.12);
+    border-color: rgba(var(--accent-rgb), 0.35);
+
+    .habit-item-title {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+  }
+
+  .habit-status-icon {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      stroke: var(--accent-primary);
+    }
+
+    .pending-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      opacity: 0.5;
+    }
+  }
+
+  .habit-item-title {
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.no-habits-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  text-align: center;
+  padding-top: 12px;
 }
 
 // ─── MONTH VIEW ───────────────────────────────────────────────────────────────
@@ -433,11 +466,13 @@
 }
 
 .month-cell {
-  min-height: 80px;
-  padding: 8px;
+  min-height: 95px;
+  padding: 6px 8px;
   border-right: 1px solid var(--border-color);
   transition: background 0.15s;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 
   &:last-child { border-right: none; }
 
@@ -448,35 +483,84 @@
   &.today .cell-date {
     background: var(--accent-primary);
     color: #fff;
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  &[data-intensity="1"] { background: rgba(var(--accent-rgb), 0.10); }
-  &[data-intensity="2"] { background: rgba(var(--accent-rgb), 0.22); }
-  &[data-intensity="3"] { background: rgba(var(--accent-rgb), 0.38); }
-  &[data-intensity="4"] { background: rgba(var(--accent-rgb), 0.55); }
+  &[data-intensity="1"] { background: rgba(var(--accent-rgb), 0.08); }
+  &[data-intensity="2"] { background: rgba(var(--accent-rgb), 0.18); }
+  &[data-intensity="3"] { background: rgba(var(--accent-rgb), 0.32); }
+  &[data-intensity="4"] { background: rgba(var(--accent-rgb), 0.48); }
 
   &:hover { background: var(--bg-card-hover); }
 }
 
-.cell-date {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  margin-bottom: 4px;
+.cell-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
 }
 
-.cell-count {
+.cell-date {
   font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.cell-badge {
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--accent-primary);
   background: rgba(var(--accent-rgb), 0.15);
-  padding: 1px 6px;
-  display: inline-block;
+  padding: 1px 5px;
+}
+
+.cell-habits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  max-height: 65px;
+}
+
+.cell-habit-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  background: var(--bg-secondary);
+  border-left: 2px solid var(--text-muted);
+  color: var(--text-muted);
+
+  &.completed {
+    border-left-color: var(--accent-primary);
+    color: var(--text-primary);
+    background: rgba(var(--accent-rgb), 0.12);
+    font-weight: 500;
+
+    .tag-status {
+      background: var(--accent-primary);
+    }
+  }
+
+  .tag-status {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .tag-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 // ─── YEAR VIEW (heatmap) ──────────────────────────────────────────────────────
